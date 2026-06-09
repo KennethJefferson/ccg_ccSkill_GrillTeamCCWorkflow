@@ -3,7 +3,7 @@ import type { Mode, BudgetProfile } from "./types.ts";
 const PROFILES: Record<Mode, BudgetProfile> = {
   quick:    { max_depth: 2, max_questions: 8,  max_children_per_node: 2, max_rounds_per_branch: 1,
               max_agent_calls: 30,  max_branches_per_judge_batch: 4, max_55_input_tokens: 40_000,
-              max_55_calls: 9, max_wall_clock_ms: 30 * 60_000,  max_report_tokens: 6_000 },
+              max_55_calls: 10, max_wall_clock_ms: 30 * 60_000,  max_report_tokens: 6_000 },
   standard: { max_depth: 4, max_questions: 24, max_children_per_node: 3, max_rounds_per_branch: 2,
               max_agent_calls: 96,  max_branches_per_judge_batch: 6, max_55_input_tokens: 60_000,
               max_55_calls: 18, max_wall_clock_ms: 120 * 60_000, max_report_tokens: 15_000 },

@@ -19,7 +19,10 @@ test("tracker reports the first cap that trips", () => {
 
 test("every 55 call decrements the same counter (agenda, level, chunk, retry, coverage)", () => {
   const t = new BudgetTracker(getProfile("quick")); // max_55_calls 10
+  // Spend exactly the cap (10); each spend is still within budget.
   for (let i = 0; i < 10; i++) { assert(t.tripped() === null, `call ${i}`); t.spend55(); }
+  assert(t.tripped() === null, "exactly at the cap is still OK");
+  t.spend55(); // the 11th call exceeds the cap
   assert(t.tripped() === "max_55_calls", "trips on the 11th 55 call");
 });
 
