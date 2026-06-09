@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["question_id","status","verdict_reason","evidence_required","unresolved_assumptions","rejected_alternatives","spawned_questions"],
+  "properties": {
+    "question_id": { "type": "string", "minLength": 1 },
+    "status": { "enum": ["resolved","contested","budget_exhausted","out_of_scope"] },
+    "verdict_reason": { "type": "string", "minLength": 1 },
+    "evidence_required": { "type": "array", "items": { "type": "string" } },
+    "unresolved_assumptions": { "type": "array", "items": { "type": "string" } },
+    "rejected_alternatives": { "type": "array", "items": { "type": "string" } },
+    "spawned_questions": { "type": "array", "items": {
+      "type": "object", "required": ["question","rationale","stakes"],
+      "properties": { "question": { "type": "string" }, "rationale": { "type": "string" }, "stakes": { "enum": ["low","med","high"] } } } }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["persona","question_id","answer","claims","assumptions","refutations","follow_up_questions","open_unknowns"],
+  "properties": {
+    "persona": { "type": "string", "minLength": 1 },
+    "question_id": { "type": "string", "minLength": 1 },
+    "answer": { "type": "string", "minLength": 1 },
+    "claims": { "type": "array", "items": {
+      "type": "object", "required": ["claim","evidence","confidence"],
+      "properties": {
+        "claim": { "type": "string" },
+        "evidence": { "type": "array", "items": {
+          "type": "object", "required": ["path_line","snippet"],
+          "properties": { "path_line": { "type": "string" }, "snippet": { "type": "string" } } } },
+        "confidence": { "enum": ["low","medium","high"] } } } },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "refutations": { "type": "array", "items": { "type": "string" } },
+    "follow_up_questions": { "type": "array", "items": { "type": "string" } },
+    "open_unknowns": { "type": "array", "items": { "type": "string" } }
+  }
+}

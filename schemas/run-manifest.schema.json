@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["mode","subject","budgets_spent","calls_55","wall_clock_ms","preflight_ok"],
+  "properties": {
+    "mode": { "enum": ["quick","standard","deep"] },
+    "subject": { "type": "string" },
+    "budgets_spent": { "type": "object" },
+    "calls_55": { "type": "integer" },
+    "wall_clock_ms": { "type": "integer" },
+    "preflight_ok": { "type": "boolean" }
+  }
+}

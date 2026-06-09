@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["mode","subject","branches"],
+  "properties": {
+    "mode": { "enum": ["quick","standard","deep"] },
+    "subject": { "type": "string" },
+    "branches": { "type": "array", "items": {
+      "type": "object",
+      "required": ["id","parent_id","depth","question","recommended_answer","status","rounds","panel_answers","ruling"],
+      "properties": {
+        "id": { "type": "string" }, "parent_id": { "type": ["string","null"] },
+        "depth": { "type": "integer" }, "question": { "type": "string" },
+        "recommended_answer": { "type": "string" },
+        "status": { "enum": ["open","resolved","contested","budget_exhausted","out_of_scope"] },
+        "rounds": { "type": "integer" },
+        "panel_answers": { "type": "array" }, "ruling": { "type": ["object","null"] } } } }
+  }
+}

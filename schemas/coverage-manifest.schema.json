@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["files_covered","files_excluded","deferred_gaps_checked","open_unknowns"],
+  "properties": {
+    "files_covered": { "type": "array", "items": { "type": "string" } },
+    "files_excluded": { "type": "array", "items": {
+      "type": "object", "required": ["path","why"],
+      "properties": { "path": { "type": "string" }, "why": { "type": "string" } } } },
+    "deferred_gaps_checked": { "type": "array", "items": { "type": "string" } },
+    "open_unknowns": { "type": "array", "items": { "type": "string" } }
+  }
+}
