@@ -1864,17 +1864,23 @@ test("SCENARIO contested-freeze: a branch contested twice freezes, not infinite"
 });
 
 test("SCENARIO budget-exhaustion: question cap trips and remaining branches are marked", () => {
+  // max_questions=2 (cap allows exactly 2 spends; the 3rd exceeds it) with 4 seeded branches,
+  // checking the trip AFTER each spend so it fires mid-grill while a branch remains open.
   const p = { ...getProfile("quick"), max_questions: 2 };
   const t = new TreeState("quick", "subj", p);
   const bt = new BudgetTracker(p);
-  t.seed([{ question: "q1", recommended_answer: "a" }, { question: "q2", recommended_answer: "a" }, { question: "q3", recommended_answer: "a" }]);
+  t.seed([
+    { question: "q1", recommended_answer: "a" }, { question: "q2", recommended_answer: "a" },
+    { question: "q3", recommended_answer: "a" }, { question: "q4", recommended_answer: "a" },
+  ]);
   for (const b of t.frontier()) {
-    if (bt.tripped()) break;
-    t.applyRuling(b.id, ruling(b.id, "resolved")); bt.spendQuestion();
+    t.applyRuling(b.id, ruling(b.id, "resolved"));
+    bt.spendQuestion();
+    if (bt.tripped()) break; // check AFTER spend so the trip is caught while branches remain open
   }
   if (bt.tripped()) t.budgetExhaustRemaining();
   assert(bt.tripped() === "max_questions", "tripped on questions");
-  assert(t.all().some(b => b.status === "budget_exhausted"), "remaining exhausted");
+  assert(t.all().some(b => b.status === "budget_exhausted"), "remaining branches exhausted");
 });
 
 test("SCENARIO batch-split: a wide frontier chunks into multiple judge calls", () => {
