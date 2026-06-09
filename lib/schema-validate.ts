@@ -26,7 +26,7 @@ function typeOf(v: unknown): string {
 function matchesType(v: unknown, t: string): boolean {
   if (t === "number") return typeof v === "number" && Number.isFinite(v);
   if (t === "integer") return Number.isInteger(v);
-  return typeOf(v) === t || (t === "number" && typeOf(v) === "integer");
+  return typeOf(v) === t;
 }
 
 function walk(v: unknown, schema: Schema, path: string, errors: string[]): void {
