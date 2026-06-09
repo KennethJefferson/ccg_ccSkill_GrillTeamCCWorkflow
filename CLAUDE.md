@@ -47,6 +47,13 @@ If a change would let CC48 (or any Claude) close a branch, it is wrong by constr
 - **55 calls are expensive (~4–6 min each, max effort).** Every 55 call — agenda-vet, each judge
   chunk, parse-retries, coverage — must decrement `max_55_calls`. Budgets are sized for the
   unhappy path, not the happy path.
+- **Citation verifier is a sandbox.** `path_line`/`snippet` are LLM-supplied (untrusted). The
+  verifier MUST reject absolute paths and dotdot-traversal (resolve + `startsWith(root + sep)`),
+  and MUST reject an empty/whitespace snippet (`"".includes("")` is true → would validate any
+  line). Both were CRITICAL bugs caught in code review during the build — do not regress them.
+- **Don't change a spec value to make a test pass.** Budget numbers are reviewed design (55
+  finding #3). A Task-3 implementer lowered `max_55_calls` quick 10→9 to satisfy an off-by-one
+  test; the TEST was wrong. If a test contradicts a spec value, fix the test.
 
 ## Personas & prompts
 

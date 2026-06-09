@@ -687,7 +687,7 @@ Expected: FAIL — module not found.
 
 ```typescript
 import { readFileSync, existsSync } from "fs";
-import { join, isAbsolute } from "path";
+import { join, resolve, isAbsolute, sep } from "path";
 import type { EvidenceRef, Claim, InterviewAnswer } from "./types.ts";
 
 export type CiteReason = "ok" | "bad_path_line" | "file_not_found" | "line_out_of_range" | "snippet_not_at_line";
@@ -698,13 +698,24 @@ export function verifyCitation(snapshotRoot: string, ref: EvidenceRef): CiteResu
   if (!m) return { ok: false, reason: "bad_path_line" };
   const rel = m[1];
   const lineNo = parseInt(m[2], 10);
-  const full = isAbsolute(rel) ? rel : join(snapshotRoot, rel);
+  // SECURITY: path_line is untrusted (LLM-supplied). The verifier MUST stay inside the
+  // snapshot root — reject absolute paths and any path that resolves outside the root
+  // (dotdot traversal). join() alone does not canonicalize, so resolve + containment-check.
+  if (isAbsolute(rel)) return { ok: false, reason: "bad_path_line" };
+  const rootResolved = resolve(snapshotRoot);
+  const full = resolve(rootResolved, rel);
+  if (full !== rootResolved && !full.startsWith(rootResolved + sep)) {
+    return { ok: false, reason: "bad_path_line" };
+  }
   if (!existsSync(full)) return { ok: false, reason: "file_not_found" };
   const lines = readFileSync(full, "utf8").split(/\r?\n/);
   if (lineNo < 1 || lineNo > lines.length) return { ok: false, reason: "line_out_of_range" };
   const target = lines[lineNo - 1];
   // Snippet must appear at the cited line (normalized whitespace, substring match).
   const norm = (s: string) => s.replace(/\s+/g, " ").trim();
+  // SECURITY: an empty/whitespace-only snippet normalizes to "" and ""-includes is always
+  // true, which would validate against any line — reject it so blank citations can't pass.
+  if (!norm(ref.snippet)) return { ok: false, reason: "snippet_not_at_line" };
   if (!norm(target).includes(norm(ref.snippet))) return { ok: false, reason: "snippet_not_at_line" };
   return { ok: true, reason: "ok" };
 }
