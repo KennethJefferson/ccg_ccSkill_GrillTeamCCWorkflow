@@ -807,7 +807,9 @@ test("spawned questions become child branches at depth+1, bounded by max_childre
   const p = getProfile("standard"); // max_children_per_node 3
   const t = new TreeState("standard", "subj", p);
   const [b] = t.seed([{ question: "Q1", recommended_answer: "A1" }]);
-  t.applyRuling(b.id, ruling(b.id, "contested", 5)); // 5 spawned, cap 3
+  // Spawning happens only on a FINAL ruling; "resolved" is final and may still surface
+  // follow-up sub-questions. (A "contested" ruling with rounds left reopens, not spawns.)
+  t.applyRuling(b.id, ruling(b.id, "resolved", 5)); // 5 spawned, cap 3
   const kids = t.frontier();
   assert(kids.length === 3, `capped to 3, got ${kids.length}`);
   assert(kids.every(k => k.depth === 1 && k.parent_id === b.id), "children parented at depth 1");
@@ -817,9 +819,10 @@ test("children are NOT spawned beyond max_depth", () => {
   const p = { ...getProfile("standard"), max_depth: 1 };
   const t = new TreeState("standard", "subj", p);
   const [b] = t.seed([{ question: "Q1", recommended_answer: "A1" }]); // depth 0
-  t.applyRuling(b.id, ruling(b.id, "contested", 2));                  // kids would be depth 1 (== max), allowed
+  t.applyRuling(b.id, ruling(b.id, "resolved", 2));                   // final: kids depth 1 (== max), allowed
   const kids = t.frontier();
-  kids.forEach(k => t.applyRuling(k.id, ruling(k.id, "contested", 2))); // grandkids depth 2 > max, blocked
+  assert(kids.length === 2, `two children at depth 1, got ${kids.length}`);
+  kids.forEach(k => t.applyRuling(k.id, ruling(k.id, "resolved", 2))); // grandkids depth 2 > max, blocked
   assert(t.frontier().length === 0, "no branches past max_depth");
 });
 
