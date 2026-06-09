@@ -29,4 +29,10 @@ test("fails clean when there is no text in the result", async () => {
   assert(!r.ok && r.error.includes("no text"), JSON.stringify(r));
 });
 
+test("fails clean on a malformed inner envelope (ok:true but no value field)", async () => {
+  const runner: BridgeRunner = async () => ({ ok: true, result: { ok: true } });
+  const r = await dispatch55({ runId: "R", nodeId: "n", prompt: "hi", projectCwd: "C:\\p" }, runner);
+  assert(!r.ok && r.error.includes("malformed inner envelope"), JSON.stringify(r));
+});
+
 summarize();

@@ -35,6 +35,12 @@ export async function dispatch55(args: Dispatch55Args, runner: BridgeRunner): Pr
   // team-tool wraps the manager's own envelope: result.ok / result.value
   const inner = env.result;
   if (inner && inner.ok === false) return { ok: false, error: `dispatch failed: ${inner.error?.message ?? "unknown"}` };
+  // Inner is the manager's Result envelope: { ok:true, value:{...} }. A truthy ok:true
+  // with no value is a protocol violation — surface it precisely rather than silently
+  // falling back (which would just degrade to the vaguer "no text" error downstream).
+  if (inner && inner.ok !== false && inner.value === undefined) {
+    return { ok: false, error: "malformed inner envelope: ok:true but no value field" };
+  }
   const value = inner?.value ?? inner;
   const text = extractText(value);
   if (text === null) return { ok: false, error: "no text in dispatch result (no artifact_text/response.md)" };
