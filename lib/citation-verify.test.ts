@@ -48,4 +48,34 @@ test("verifyAnswerCitations partitions valid vs dropped claims", () => {
   assert(r.dropped.length === 1 && r.dropped[0].claim === "bad", "dropped bad");
 });
 
+test("citation to a line past EOF is rejected as line_out_of_range", () => {
+  const snap = snapshotWith("a.ts", ["alpha", "beta"]);
+  const r = verifyCitation(snap, { path_line: "a.ts:99", snippet: "alpha" });
+  assert(!r.ok && r.reason === "line_out_of_range", r.reason);
+});
+
+test("absolute path_line is rejected (sandbox escape)", () => {
+  const snap = snapshotWith("a.ts", ["alpha"]);
+  const r = verifyCitation(snap, { path_line: "/etc/passwd:1", snippet: "root" });
+  assert(!r.ok && r.reason === "bad_path_line", r.reason);
+});
+
+test("dotdot traversal is rejected (must not read outside snapshot)", () => {
+  const snap = snapshotWith("a.ts", ["alpha"]);
+  const r = verifyCitation(snap, { path_line: "../escape.ts:1", snippet: "x" });
+  assert(!r.ok && r.reason === "bad_path_line", r.reason);
+});
+
+test("empty snippet is rejected (matches everything otherwise)", () => {
+  const snap = snapshotWith("a.ts", ["alpha"]);
+  const r = verifyCitation(snap, { path_line: "a.ts:1", snippet: "" });
+  assert(!r.ok && r.reason === "snippet_not_at_line", r.reason);
+});
+
+test("whitespace-only snippet is rejected", () => {
+  const snap = snapshotWith("a.ts", ["alpha"]);
+  const r = verifyCitation(snap, { path_line: "a.ts:1", snippet: "   " });
+  assert(!r.ok && r.reason === "snippet_not_at_line", r.reason);
+});
+
 summarize();
