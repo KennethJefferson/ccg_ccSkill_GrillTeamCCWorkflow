@@ -1003,7 +1003,7 @@ test("chunkFrontier respects the branch-count cap", () => {
 
 test("chunkFrontier splits earlier when token cap is the binding constraint", () => {
   const big = branch("BIG");
-  big.question = "Q".repeat(5000); // inflate token estimate
+  big.question = "Q".repeat(9000); // ~9200-char digest => ~2300 tokens, over the 2000 cap
   const p = { ...getProfile("standard"), max_branches_per_judge_batch: 99, max_55_input_tokens: 2000 };
   const chunks = chunkFrontier([big, branch("B2"), branch("B3")], p);
   assert(chunks.length >= 2, `token cap forces a split, got ${chunks.length} chunks`);
