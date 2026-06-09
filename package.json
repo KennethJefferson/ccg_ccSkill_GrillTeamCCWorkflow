@@ -4,7 +4,17 @@
   "private": true,
   "description": "Self-interrogating audit harness: Claude panel, 55/Codex external judge.",
   "type": "module",
-  "engines": { "node": ">=20" },
-  "scripts": { "test": "npx tsx scripts/run-all-tests.ts" },
-  "peerDependencies": { "tsx": ">=4.0.0" }
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "npx tsx scripts/run-all-tests.ts"
+  },
+  "peerDependencies": {
+    "tsx": ">=4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "typescript": "^6.0.3"
+  }
 }
